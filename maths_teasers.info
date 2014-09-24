@@ -1,0 +1,10 @@
+name = maths teasers
+description = provide maths teaser for front page
+core = 7.x
+package = Features
+version = 7.x-1.0-beta4
+project = maths_teasers
+dependencies[] = features
+features[features_api][] = api:2
+
+

@@ -1,0 +1,59 @@
+<?php
+/**
+ * @file
+ * Code for the Teasers feature.
+ */
+
+/**
+ * Implements hook_entity_info_alter().
+ */
+function maths_teasers_entity_info_alter(&$entity_info) {
+
+  $entity_info['node']['view modes'] += array(
+    'fp_teaser' => array(
+      'label' => t('Front Page Teaser'),
+      'custom settings' => TRUE,
+    )
+  );
+}
+
+/**
+ * Implements hook_theme_registry_alter().
+ */
+function maths_teasers_theme_registry_alter(&$theme_registry) {
+  $module_path = drupal_get_path('module', 'maths_teasers') . '/templates';
+
+  _theme_process_registry($theme_registry, 'phptemplate', 'theme_engine', 'maths_teasers', $module_path);
+}
+
+/**
+ * Implements template_preprocess_node().
+ */
+function maths_teasers_preprocess_node(&$vars) {
+  $view_modes = array('fpteaser');
+
+  if (in_array($vars['view_mode'], $view_modes)) {
+    $vars['theme_hook_suggestions'][] = 'node____' . $vars['view_mode'];
+    $vars['theme_hook_suggestions'][] = 'node__' . $vars['type'] . '__' . $vars['view_mode'];
+    $vars['theme_hook_suggestions'][] = 'node__' . $vars['nid'] . '__' . $vars['view_mode'];
+    $vars['date'] = format_date($vars['node']->created, 'custom', 'j F Y');
+  }
+  
+}
+
+/**
+ * Implements template_preprocess_field().
+ */
+function maths_teasers_preprocess_field(&$vars) {
+  $view_modes = array('fpteaser');
+
+  if (in_array($vars['element']['#view_mode'], $view_modes) && 'smart_trim_format' === $vars['element']['#formatter']) {
+    foreach ($vars['items'] as $key => $value) {
+      if (FALSE === strpos($vars['items'][$key]['#markup'], '<')) {
+        // Wrap smart-trimmed text that has stripped HTML in a paragraph element.
+        $vars['items'][$key]['#markup'] = '<p>' . $vars['items'][$key]['#markup'] . '</p>';
+      }
+    }
+  }
+
+}
